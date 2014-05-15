@@ -155,6 +155,11 @@ class NullableForeignKeySource(RESTFrameworkModel):
                                verbose_name='Optional target object')
 
 
+# Unique target
+class UniqueForeignKeyTarget(RESTFrameworkModel):
+    name = models.CharField(max_length=100, unique=True)
+
+
 # OneToOne
 class OneToOneTarget(RESTFrameworkModel):
     name = models.CharField(max_length=100)

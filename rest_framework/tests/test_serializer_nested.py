@@ -345,3 +345,23 @@ class NestedModelSerializerUpdateTests(TestCase):
         result = deserialize.object
         result.save()
         self.assertEqual(result.id, john.id)
+
+    def test_update_unique_nullable_foreign_key(self):
+        class TargetSerializer(serializers.ModelSerializer):
+            class Meta:
+                model = models.UniqueForeignKeyTarget
+
+        class SourceSerializer(serializers.ModelSerializer):
+            target = TargetSerializer()
+            class Meta:
+                model = models.NullableForeignKeySource
+
+        target = models.UniqueForeignKeyTarget.objects.create(name='Mr. Longfellow')
+        source = models.NullableForeignKeySource.objects.create(name='Dr. Lamborghini')
+        target_serializer = TargetSerializer(instance=target)
+        source_serializer = SourceSerializer(instance=source)
+        source_data = source_serializer.data
+        source_data['target'] = target_serializer.data
+        deserializer = SourceSerializer(data=source_data)
+        deserializer.is_valid()
+        self.assertFalse(deserializer.errors)
